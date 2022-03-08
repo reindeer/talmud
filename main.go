@@ -1,9 +1,6 @@
 package main
 
 import (
-	"bufio"
-	"fmt"
-	"os"
 	"strconv"
 
 	"github.com/atotto/clipboard"
@@ -26,10 +23,7 @@ func main() {
 	if *del != 0 {
 		accounts.Repository().Delete(*del)
 	} else if masterPassword != nil && *masterPassword {
-		fmt.Printf("Enter master password: ")
-		scanner := bufio.NewScanner(os.Stdin)
-		scanner.Scan()
-		master.Save(scanner.Text())
+		master.New().Save()
 	} else if len(args) == 1 {
 		accountId, _ := strconv.Atoi(args[0])
 		if (accountId) != 0 {
@@ -73,7 +67,7 @@ func out(account *models.Account, verbose bool) {
 		showSingleAccount(account, verbose)
 	}
 
-	masterPassword := master.Get()
+	masterPassword := master.New().Get()
 
 	gen := generator.New(&masterPassword)
 	password, err := gen.Generate(account)
