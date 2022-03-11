@@ -2,7 +2,7 @@ package accounts
 
 import (
 	"github.com/reindeer/talmud/accounts/models"
-	"github.com/reindeer/talmud/accounts/remote"
+	"github.com/reindeer/talmud/accounts/sqlite"
 )
 
 type RepositoryInterface interface {
@@ -20,7 +20,7 @@ var repository *Storage
 
 func Repository() *Storage {
 	if repository == nil {
-		storage := remote.New()
+		storage := sqlite.New()
 		repository = &Storage{RepositoryInterface: storage}
 	}
 	return repository
