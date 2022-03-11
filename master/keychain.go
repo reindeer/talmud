@@ -1,4 +1,3 @@
-//go:build darwin || ios
 // +build darwin ios
 
 package master
@@ -8,7 +7,7 @@ import (
 	"github.com/reindeer/talmud/output"
 )
 
-func (Storage) Get() string {
+func get() string {
 	query := keychain.NewItem()
 	query.SetSecClass(keychain.SecClassGenericPassword)
 	query.SetAccount("talmud")
@@ -24,8 +23,8 @@ func (Storage) Get() string {
 	return string(results[0].Data)
 }
 
-func (s Storage) Save() string {
-	password := s.Console.Save()
+func save() {
+	password := scan()
 	item := keychain.NewItem()
 	item.SetSecClass(keychain.SecClassGenericPassword)
 	item.SetAccount("talmud")
@@ -42,6 +41,4 @@ func (s Storage) Save() string {
 	if err == keychain.ErrorDuplicateItem {
 		output.Fatalf("cannot save the master password")
 	}
-
-	return ""
 }

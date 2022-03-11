@@ -23,7 +23,7 @@ func main() {
 	if *del != 0 {
 		accounts.Repository().Delete(*del)
 	} else if masterPassword != nil && *masterPassword {
-		master.New().Save()
+		master.Save()
 	} else if len(args) == 1 {
 		accountId, _ := strconv.Atoi(args[0])
 		if (accountId) != 0 {
@@ -67,7 +67,7 @@ func out(account *models.Account, verbose bool) {
 		showSingleAccount(account, verbose)
 	}
 
-	masterPassword := master.New().Get()
+	masterPassword := master.Get()
 
 	gen := generator.New(&masterPassword)
 	password, err := gen.Generate(account)
