@@ -1,5 +1,5 @@
-// +build !darwin
-// +build !ios
+//go:build !darwin && !ios && !dbus
+// +build !darwin,!ios,!dbus
 
 package master
 
