@@ -18,6 +18,7 @@ create table if not exists accounts (
 	account varchar(255) not null,
 	version int not null default 1,
 	length int null,
+	deleted int(1) default 0,
 	created_at datetime null,
 	updated_at datetime null,
 	comment text null,
@@ -56,7 +57,7 @@ func New() *Storage {
 }
 
 func (s Storage) List(domain *string) []*accounts.Account {
-	query := `select * from accounts where version>0 order by domain, account`
+	query := `select * from accounts where deleted=0 order by domain, account`
 
 	var list []*accounts.Account
 	err := s.Db.Select(&list, query)
@@ -86,7 +87,7 @@ func (s Storage) Get(accountId int) *accounts.Account {
 
 func (s Storage) Save(account *accounts.Account) {
 	_, _ = s.Db.Exec(
-		`insert into accounts (domain, account, version, length) values (?, ?, ?, ?) on conflict (domain, account) do update set version=?, length=?`,
+		`insert into accounts (domain, account, version, length) values (?, ?, ?, ?) on conflict (domain, account) do update set version=?, length=?, deleted=0`,
 		account.Domain, account.Account, account.Version, account.Length, account.Version, account.Length,
 	)
 }
@@ -94,7 +95,7 @@ func (s Storage) Save(account *accounts.Account) {
 func (s Storage) Delete(accountId int) {
 	list := s.List(nil)
 	account := list[accountId-1]
-	_, _ = s.Db.Exec("update accounts set version=-1 where id=?", account.Id)
+	_, _ = s.Db.Exec("update accounts set deleted=1 where id=?", account.Id)
 }
 
 func getPath() string {

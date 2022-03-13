@@ -9,6 +9,7 @@ type Account struct {
 	Account   string     `json:"account" db:"account"`
 	Version   int        `json:"version" db:"version"`
 	Length    int        `json:"length" db:"length"`
+	Deleted   bool       `json:"deleted" db:"deleted"`
 	CreatedAt *time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt *time.Time `json:"updated_at" db:"updated_at"`
 	Comment   *string    `json:"comment,omitempty" db:"comment,omitempty"`
