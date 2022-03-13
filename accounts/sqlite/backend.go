@@ -18,8 +18,25 @@ create table if not exists accounts (
 	account varchar(255) not null,
 	version int not null default 1,
 	length int null,
+	created_at datetime null,
+	updated_at datetime null,
+	comment text null,
 	unique (domain, account)
-)
+);
+
+create trigger if not exists [UpdatedAt]
+after insert on accounts
+for each row 
+begin
+	update accounts set created_at=CURRENT_TIMESTAMP where id=new.id;
+end;
+
+create trigger if not exists [CreatedAt]
+after update on accounts
+for each row 
+begin
+	update accounts set updated_at=CURRENT_TIMESTAMP where id=old.id;
+end;
 `
 
 type Storage struct {
