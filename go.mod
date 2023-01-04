@@ -1,6 +1,6 @@
 module github.com/reindeer/talmud
 
-go 1.16
+go 1.18
 
 require (
 	github.com/atotto/clipboard v0.1.4
@@ -11,4 +11,10 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.12
 	github.com/pborman/getopt v1.1.0
 	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211
+)
+
+require (
+	github.com/pkg/errors v0.9.1 // indirect
+	golang.org/x/crypto v0.0.0-20200323165209-0ec3e9974c59 // indirect
+	golang.org/x/sys v0.0.0-20210615035016-665e8c7367d1 // indirect
 )

@@ -1,14 +1,14 @@
 package sqlite
 
 import (
+	"fmt"
+	"github.com/reindeer/talmud/internal/try"
 	"strings"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/kirsle/configdir"
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/reindeer/talmud/output"
-
-	accounts "github.com/reindeer/talmud/accounts/models"
+	accounts "github.com/reindeer/talmud/pkg/accounts/models"
 )
 
 var schema = `
@@ -45,12 +45,7 @@ type Storage struct {
 }
 
 func New() *Storage {
-	path := getPath()
-	db, err := sqlx.Open("sqlite3", path+"/pass.db")
-	if err != nil {
-		panic(err)
-	}
-
+	db := try.Throw(sqlx.Open("sqlite3", getPath()+"/pass.db"))
 	db.MustExec(schema)
 
 	return &Storage{Db: db}
@@ -60,10 +55,7 @@ func (s Storage) List(domain *string) []*accounts.Account {
 	query := `select * from accounts where deleted=0 order by domain, account`
 
 	var list []*accounts.Account
-	err := s.Db.Select(&list, query)
-	if err != nil {
-		panic(err)
-	}
+	try.ThrowError(s.Db.Select(&list, query))
 
 	var filtered []*accounts.Account
 	for idx, account := range list {
@@ -80,7 +72,7 @@ func (s Storage) List(domain *string) []*accounts.Account {
 func (s Storage) Get(accountId int) *accounts.Account {
 	list := s.List(nil)
 	if accountId > len(list) {
-		output.Fatalf("unknown account number #%d", accountId)
+		panic(fmt.Errorf("unknown account number #%d", accountId))
 	}
 	return list[accountId-1]
 }
@@ -100,11 +92,6 @@ func (s Storage) Delete(accountId int) {
 
 func getPath() string {
 	path := configdir.LocalConfig("talmud")
-
-	err := configdir.MakePath(path)
-	if err != nil {
-		panic(err)
-	}
-
+	try.ThrowError(configdir.MakePath(path))
 	return path
 }

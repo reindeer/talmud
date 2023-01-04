@@ -1,8 +1,8 @@
 package accounts
 
 import (
-	"github.com/reindeer/talmud/accounts/models"
-	"github.com/reindeer/talmud/accounts/sqlite"
+	"github.com/reindeer/talmud/pkg/accounts/models"
+	"github.com/reindeer/talmud/pkg/accounts/sqlite"
 )
 
 type RepositoryInterface interface {

@@ -1,25 +1,40 @@
 package main
 
 import (
+	"fmt"
+	"github.com/reindeer/talmud/internal/try"
+	"os"
 	"strconv"
 
 	"github.com/atotto/clipboard"
 	"github.com/pborman/getopt"
-	"github.com/reindeer/talmud/accounts"
-	"github.com/reindeer/talmud/accounts/models"
-	"github.com/reindeer/talmud/generator"
-	"github.com/reindeer/talmud/master"
-	"github.com/reindeer/talmud/output"
+	"github.com/reindeer/talmud/pkg/accounts"
+	"github.com/reindeer/talmud/pkg/accounts/models"
+	"github.com/reindeer/talmud/pkg/generator"
+	"github.com/reindeer/talmud/pkg/master"
 )
 
 func main() {
+	try.Catch(
+		func() {
+			exec()
+		},
+		func(throwable error) {
+			fmt.Printf("\033[31m%v\033[0m\n", throwable)
+			os.Exit(1)
+		},
+	)
+}
+
+func exec() {
 	verbose := getopt.BoolLong("verbose", 'v', "Show account details")
 	find := getopt.StringLong("find", 'f', "", "Find account by domain part")
 	del := getopt.IntLong("delete", 'd', 0, "Delete account by Id")
 	masterPassword := getopt.BoolLong("master-password", 'm', "Save master password to keychain")
-	getopt.Parse()
 
+	getopt.Parse()
 	args := getopt.Args()
+
 	if *del != 0 {
 		accounts.Repository().Delete(*del)
 	} else if masterPassword != nil && *masterPassword {
@@ -51,17 +66,16 @@ func main() {
 	} else if len(args) == 0 {
 		list := accounts.Repository().List(find)
 		if len(list) == 0 {
-			output.Fatalf("no accounts found")
+			panic(fmt.Errorf("no accounts found"))
 		} else if len(list) == 1 {
 			out(list[0], *verbose || find != nil)
 		} else {
 			showAccounts(list, *verbose)
 		}
 	} else {
-		output.Fatalf("unknown request")
+		panic(fmt.Errorf("unknown request"))
 	}
 }
-
 func out(account *models.Account, verbose bool) {
 	if verbose {
 		showSingleAccount(account, verbose)
@@ -69,14 +83,10 @@ func out(account *models.Account, verbose bool) {
 
 	masterPassword := master.Get()
 
-	gen := generator.New(&masterPassword)
-	password, err := gen.Generate(account)
-	if err != nil {
-		output.Fatalf("cannot generate the password")
-	}
-	err = clipboard.WriteAll(*password)
-	if err != nil {
-		output.Printf(*password)
+	gen := generator.NewGenerator(&masterPassword)
+	password := gen.Generate(account.Domain, account.Account, account.Version, account.Length)
+	if err := clipboard.WriteAll(password); err != nil {
+		fmt.Printf("%s\n", password)
 	}
 }
 
@@ -102,5 +112,5 @@ func showSingleAccount(account *models.Account, verbose bool) {
 		params = append(params, account.Version)
 	}
 
-	output.Printf(mask, params...)
+	fmt.Printf(mask+"\n", params...)
 }

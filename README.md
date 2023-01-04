@@ -15,7 +15,7 @@ from these values as a message and the master password as a secret key.
 ### MacOs
 
 ```shell
-go build -ldflags "-w -s" -o bin/talmud main.go
+go build -ldflags "-w -s" -o bin ./cmd/...
 ```
 
 ### Linux with dbus SecretService support
@@ -23,7 +23,7 @@ go build -ldflags "-w -s" -o bin/talmud main.go
 If application is used with DBUS SecretService spec like gnome-keyring or ksecretservice.
 
 ```shell
-go build -ldflags "-w -s" -tags dbus -o bin/talmud main.go
+go build -ldflags "-w -s" -tags dbus -o bin ./cmd/...
 ```
 
 ### Linux without dbus support
@@ -31,5 +31,5 @@ go build -ldflags "-w -s" -tags dbus -o bin/talmud main.go
 If application is used without DBUS support and reads master password from stdin.
 
 ```shell
-go build -ldflags "-w -s" -o bin/talmud main.go
+go build -ldflags "-w -s" -o bin ./cmd/...
 ```
