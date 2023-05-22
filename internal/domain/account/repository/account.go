@@ -5,6 +5,8 @@ import (
 
 	"github.com/jmoiron/sqlx"
 
+	_ "github.com/mattn/go-sqlite3"
+
 	"github.com/reindeer/talmud/internal/adapter/db"
 	"github.com/reindeer/talmud/internal/domain/account/model"
 	"github.com/reindeer/talmud/pkg/try"
